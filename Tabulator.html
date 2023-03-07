@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <title>Crud Table with Tabulator</title>
+    <script src="https://cdn.jsdelivr.net/npm/tabulator-tables@4.7.1/dist/js/tabulator.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/tabulator-tables@4.7.1/dist/css/tabulator.min.css" rel="stylesheet">
+    <style>
+        .container {
+            display: flex;
+            justify-content: center;
+            flex-direction: column;
+            align-items: center;
+            flex-direction: column;
+            height: 100vh
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container" >
+        <div style="text-align: center;">Currency</div>
+        <div id="table"></div>
+        <button onclick="addRow()">Add Row</button>
+        <button onclick="SaveRow()">Save Row</button>
+    </div>
+</body>
+
+
+<script>
+    
+    var table = new Tabulator("#table", {
+        columns:[
+            {title:"Name of Currency", field:"currency", editor:"input"},
+            {title:"Per Dollar", field:"perDollar", editor:"input", editorParams:{type:"number"}},
+            {title:"No:of Dollar", field:"nod", editor:"input", editorParams:{type:"number"}},
+            {title:"Total", field:"total", formatter:function(cell, formatterParams){
+                var perDollar = cell.getRow().getData().perDollar;
+                var nod = cell.getRow().getData().nod;
+                return perDollar * nod;
+            }},
+            {title:"Add", formatter:function(cell, formatterParams){
+            return "<button>Delete</button>";
+            }, width:100, align:"center", cellClick:function(e, cell){
+            cell.getRow().delete();
+            }}
+        ],
+        cellEdited:function(cell){
+            cell.getRow().update({
+                total: cell.getRow().getData().perDollar * cell.getRow().getData().nod
+            });
+        },
+    });
+
+    function addRow() {
+        table.addRow({});
+    }
+    function SaveRow() {
+        var data = table.getData();
+        localStorage.setItem("savedData", JSON.stringify(data));
+    }
+</script>
+</body>
+</html>
